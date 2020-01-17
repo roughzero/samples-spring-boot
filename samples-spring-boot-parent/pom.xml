@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>rough.samples</groupId>
+    <artifactId>samples-spring-boot-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>../samples-spring-boot-bootapp</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.8.RELEASE</version>
+    </parent>
+
+    <properties>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>1.3</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 使用编译参数打包成不同环境的发布包 -->
+    <!-- test 默认环境，供开发人员在 IDE 下测试，除了 test 环境以外，均需要使用 jndi -->
+    <!-- dev 供开发人员在本机的 weblogic 测试 -->
+    <!-- dat 测试人员测试环境 -->
+    <!-- uat 用户测试环境 -->
+    <!-- stg 预演环境 -->
+    <!-- prd 生产环境 -->
+    <profiles>
+        <profile>
+            <id>test</id>
+            <properties>
+                <activeProfile>test</activeProfile>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <activeProfile>dev</activeProfile>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <!-- 最终包名为默认包名加上环境名-->
+        <finalName>${project.name}-${project.version}-${activeProfile}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <classifier>exec</classifier> <!-- 打包时生成原始包与可执行包，可执行包结尾的加上 exec 标识 -->
+                    <attach>false</attach> <!-- 发布到仓库时只发布原始包，不发布可执行包 -->
+                    <!-- 由于在打 war 包时是在 classes 目录里面找 main class 的， 所以需要指定 main class -->
+                    <mainClass>rough.samples.springboot.Application</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

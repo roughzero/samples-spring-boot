@@ -1,0 +1,37 @@
+package rough.samples.spring.boot;
+
+import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.WebApplicationInitializer;
+
+@SpringBootApplication
+@ComponentScan("rough")
+@EnableScheduling
+@CommonsLog
+@Configuration
+@EnableConfigurationProperties
+public class Application extends SpringBootServletInitializer
+        implements WebApplicationInitializer {
+    // 这边的继承以及实现是为了兼容 weblogic.
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class);
+    }
+
+    public static void main(String[] args) {
+        log.info("Start application.");
+        ApplicationContext applicationContext = SpringApplication.run(Application.class, args);
+        ConfigureHolder configureHolder = applicationContext.getBean(ConfigureHolder.class);
+        System.out.println(configureHolder.getProfile());
+    }
+
+}
