@@ -1,6 +1,5 @@
 /target/
 *.iml
 *.idea
-*.lst
-*.project
+.project
 *.classpath

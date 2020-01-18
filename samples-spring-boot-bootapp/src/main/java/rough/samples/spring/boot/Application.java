@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
 
 @SpringBootApplication
@@ -18,6 +19,7 @@ import org.springframework.web.WebApplicationInitializer;
 @CommonsLog
 @Configuration
 @EnableConfigurationProperties
+@EnableTransactionManagement
 public class Application extends SpringBootServletInitializer
         implements WebApplicationInitializer {
     // 这边的继承以及实现是为了兼容 weblogic.
@@ -29,9 +31,7 @@ public class Application extends SpringBootServletInitializer
 
     public static void main(String[] args) {
         log.info("Start application.");
-        ApplicationContext applicationContext = SpringApplication.run(Application.class, args);
-        ConfigureHolder configureHolder = applicationContext.getBean(ConfigureHolder.class);
-        System.out.println(configureHolder.getProfile());
+        SpringApplication.run(Application.class, args);
     }
 
 }

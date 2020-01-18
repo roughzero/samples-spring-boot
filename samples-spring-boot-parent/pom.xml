@@ -9,6 +9,8 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>../samples-spring-boot-bootapp</module>
+        <module>../samples-spring-boot-db</module>
+        <module>../samples-spring-boot-rest</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -19,28 +21,27 @@
     </parent>
 
     <properties>
+        <oracle.driver.version>11g1.6</oracle.driver.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
+                <groupId>com.oracle.driver</groupId>
+                <artifactId>jdbc-driver</artifactId>
+                <version>${oracle.driver.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.1.1</version>
             </dependency>
-            <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>1.3</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <!-- 使用编译参数打包成不同环境的发布包 -->
+    <!-- 在打包时使用 -PprofileId 的形式选择环境 -->
     <!-- test 默认环境，供开发人员在 IDE 下测试，除了 test 环境以外，均需要使用 jndi -->
     <!-- dev 供开发人员在本机的 weblogic 测试 -->
     <!-- dat 测试人员测试环境 -->
