@@ -21,7 +21,7 @@ Spring boot 工程相关示例，内容如下：
   - [ ] 事务处理进阶
     - [ ] 是否可以全局配置
     - [ ] 超时等精细话的配置如何进行
-  - [ ] 切片以及使用例子
+  - [x] 切片以及使用例子
   - [ ] Log的配置方法
 
 ## 发布到 weblogic
@@ -257,3 +257,16 @@ public class DataSourceTest {
 
 1. 在 Application 类中加入 `@EnableScheduling`注解
 2. 在需要定时执行的方法前加入注解：`@EnableScheduling`
+
+### 切片以及使用例子
+
+先引入`spring-aspects`
+
+```xml
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+        </dependency>
+```
+
+代码示例参见`AspectSample`
