@@ -3,10 +3,12 @@ package rough.samples.spring.boot.db;
 import lombok.extern.apachecommons.CommonsLog;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 @Aspect
 @CommonsLog
+@Component
 public class AspectSample {
 
     /**

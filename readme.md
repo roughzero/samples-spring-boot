@@ -14,7 +14,7 @@ Spring boot 工程相关示例，内容如下：
   - [x] 指定包名
   - [x] 根据配置文件打包（结合 Maven）
 - [ ] 其他
-  - [ ] 定时任务
+  - [x] 定时任务
   - [x] 属性配置类
   - [x] 测试类
   - [x] 事务处理
@@ -22,7 +22,7 @@ Spring boot 工程相关示例，内容如下：
     - [ ] 是否可以全局配置
     - [ ] 超时等精细话的配置如何进行
   - [x] 切片以及使用例子
-  - [ ] Log的配置方法
+  - [x] Log的配置方法
 
 ## 发布到 weblogic
 
@@ -270,3 +270,69 @@ public class DataSourceTest {
 ```
 
 代码示例参见`AspectSample`
+
+### Log配置
+
+使用默认的 logback，只要在**application.properties**或者**application.yml**中配置日志级别就可以了。
+
+console默认输入ERROR, WARN ，INFO级别的日志。可通过修改logging.level属性来改变日志的输出级别。可以通过配置logging.file属性或logging.path属性将日志输出到文件中。当文件到达10M的时候，将新建一个文件记录日志。
+
+1. 配置 level （yaml）
+
+```yaml
+# 建议基础级别定义为 WARN，然后根据自己的需要定义对应包的级别
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        security: DEBUG
+        web: ERROR    
+      hibernate: DEBUG        
+      apache:
+        commons:
+          dbcp2: DEBUG 
+```
+
+2. logging.path & logging.file
+
+```yaml
+logging:
+  path: concretepage/logs
+  file: mylogfile.log
+```
+
+3. 日志样式
+
+```yaml
+logging:
+  pattern:
+    console: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
+    file: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
+```
+
+4. 在程序中使用
+
+使用 slf4j 和 commons-logging 都可以，我个人比较习惯使用 commons-logging，原因是在记录 exception 时有 (msg, exception) 的方法比较方便。
+
+```java
+@CommonsLog // 使用 lombok 定义 commons-logging
+
+@Slf4j // 使用 lombok 定义 slf4j
+
+public class UsageClass {
+    public static void main(String[] args) {
+        log.info("log message"); // 无论是使用 slf4j 还是 commons-logging 记录工具的名称都是 log
+    }
+}
+
+
+```
+
+
+
+
+
+
+
+参考资料： [简书上的Spring Boot Logging 配置](https://www.jianshu.com/p/1fa12b92d5c4)
