@@ -8,6 +8,12 @@ Spring boot 工程相关示例，内容如下：
   - [x] 多数据源的 NamedJdbcTemplate 配置
   - [x] 多数据源时数据库连接与 jndi 配置兼容
   - [ ] myBatis 多数据源配置
+- [ ] MyBatis 生成与添加方法
+  - [ ] 使用 MyBatis Generator 生成
+    - [ ] MyBatis3（传统 XML 形态）
+    - [ ] MyBatis3Simple（注解形态）
+    - [x] MyBatis3DynamicSql（暂不研究）
+    - [x] MyBatis3Kotlin（略）
 - [x] 打包发布
   - [x] 打包成原始，而不是可执行
   - [x] 同一个工程做成多个包，可以根据需要发布选定的内容
@@ -116,6 +122,137 @@ public class DataSourceConfigure {
 ```
 
 ### 多数据源的 myBatis 配置
+
+## MyBatis 生成与添加方法
+
+### 使用 MyBatis Generator 生成
+
+目前最新版本为 1.40，已取消对 ibatis 的支持，并且默认使用 MyBatis3DynamicSql。
+
+我们需要解决的问题是
+
+1. 如何生成
+2. 能够兼容 CHAR 类型的字段，要求做到
+   1. 读取后去掉尾部的空格
+   2. 查询时使用去掉空格的字符串能够正常查询
+
+统一使用命令行生成方式，为简化执行命令，使用传统 java 工程而不是 maven 工程（mybatis-generator-core-1.4.0.jar 是通过 maven 库下载的）
+
+使用的测试表结构如下，为包含自动生成序列主键
+
+```sql
+-- 准备示例数据表，包含 VARCHAR 和 CHAR 类型
+CREATE TABLE SPL_USER
+(
+    USER_ID        CHAR (30) NOT NULL PRIMARY KEY,
+    USER_CODE      CHAR (20) NOT NULL,
+    USER_NAME      VARCHAR2 (100),
+    CREATE_TIME    DATE
+);
+```
+
+
+
+关于 MyBatis 生成部分的资料参见 [MyBatis Generator 官方网站](http://mybatis.org/generator/index.html)
+
+#### MyBatis3（传统 XML 形态）
+
+1. 创建配置文件 generateConfigMyBatis3.xml，这里在表中设置属性可以去掉尾部空格
+
+```xml
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+    <classPathEntry location="lib/jdbc-driver-11g1.6.jar"/>
+
+    <context id="dynamicSql" targetRuntime="MyBatis3DynamicSql">
+        <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
+                        connectionURL="jdbc:oracle:thin:@192.168.5.128:1521:demo"
+                        userId="rough" password="rough"/>
+        <javaModelGenerator targetPackage="rough.samples.spring.boot.mybatis.dynamic.model"
+                            targetProject="output/src/main/java"/>
+
+        <javaClientGenerator targetPackage="rough.samples.spring.boot.mybatis.dynamic.mapper"
+                             targetProject="output/src/main/java"/>
+
+        <table tableName="SPL_USER" domainObjectName="SplUser">
+            <property name="useActualColumnName" value="false"/>
+            <!-- 使属性 trimString = true 可以去掉查询得到的值的尾部空格-->
+            <property name="trimString" value="true"/>
+        </table>
+    </context>
+</generatorConfiguration>
+```
+
+2. 为满足查询时使用去掉空格的字符串能够正常查询，需要改造生成程序，并将其的执行路径放在 jar 包之前，具体做法如下：
+
+   1. 先创建一个 MyMyBatis3FormattingUtilities 类，该类在 CHAR 类型字段作为查询条件时，自动对传入参数作 RPAD处理，主要代码如下：
+
+   ```java
+   public class MyMyBatis3FormattingUtilities {
+       public static final String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn) {
+           return getParameterClauseInWhereCondition(introspectedColumn, null);
+       }
+   
+       public static final String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn, String prefix) {
+           StringBuilder sb = new StringBuilder();
+   
+           if (introspectedColumn.getJdbcType() == Types.CHAR) {
+               sb.append("RPAD(");
+           }
+   
+           sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn, prefix));
+   
+           if (introspectedColumn.getJdbcType() == Types.CHAR) {
+               sb.append(", ");
+               sb.append(introspectedColumn.getLength());
+               sb.append(", ' ')");
+           }
+   
+           return sb.toString();
+       }
+   }
+   
+   ```
+
+   2. 修改创建 XML 中 SQL 代码的类，调整生成查询条件的代码，使其生成额外做过处理的代码，这几个类为 org.mybatis.generator.codegen.mybatis3 包下的
+
+   ```java
+   DeleteByPrimaryKeyElementGenerator
+   SelectByPrimaryKeyElementGenerator
+SimpleSelectByPrimaryKeyElementGenerator
+   UpdateByPrimaryKeySelectiveElementGenerator
+   UpdateByPrimaryKeyWithBLOBsElementGenerator
+   UpdateByPrimaryKeyWithoutBLOBsElementGenerator
+   ```
+   
+   可参见例子，这些代码都是根据原始代码进行修改的，使用`MyMyBatis3FormattingUtilities`的地方就是修改的地方。
+   
+   3. 使用如下命令行生成
+   
+   ```shell
+   generate.sh generateConfigMyBatis3.xml
+   ```
+   
+   命令具体内容可直接看 generate.sh
+   
+   4. 测试：详见`samples-spring-boot-mybatis`工程
+
+#### MyBatis3Simple（注解形态）
+
+注解形式生成的内容较少，不需要写 xml 文件，推荐数据结构简单的时候使用。
+
+生成的方式与传统 XML 形态类似，过程就不详细说明了，配置文件为 generateConfigMyBatis3Simple.xl，测试工程为``samples-spring-boot-mybatis-simple`
+
+#### MyBatis3DynamicSql（暂不研究）
+
+尽管是目前的默认推荐形式，但是由于没有找到具体的例子，官网介绍较少，没有相关文档，在查询时就无法使用 CHAR 类型字段进行查询，故先暂时放一下，以后有机会再说。
+
+#### MyBatis3Kotlin（略）
+
+这个生成的是 Kotlin，就忽略了
 
 ## 打包发布
 

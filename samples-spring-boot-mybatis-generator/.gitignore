@@ -1,7 +1,8 @@
-/out/
 /target/
 *.iml
 *.idea
 *.lst
 *.project
 *.classpath
+/lib/
+/output/

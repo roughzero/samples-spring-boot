@@ -1,0 +1,8 @@
+-- 准备示例数据表，包含 VARCHAR 和 CHAR 类型
+CREATE TABLE SPL_USER
+(
+    USER_ID        CHAR (30) NOT NULL PRIMARY KEY,
+    USER_CODE      CHAR (20) NOT NULL,
+    USER_NAME      VARCHAR2 (100),
+    CREATE_TIME    DATE
+);

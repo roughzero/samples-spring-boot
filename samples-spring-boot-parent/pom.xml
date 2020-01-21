@@ -11,6 +11,9 @@
         <module>../samples-spring-boot-bootapp</module>
         <module>../samples-spring-boot-db</module>
         <module>../samples-spring-boot-rest</module>
+        <module>../samples-spring-boot-mybatis-dynamic-sql</module>
+        <module>../samples-spring-boot-mybatis</module>
+        <module>../samples-spring-boot-mybatis-simple</module>
     </modules>
     <packaging>pom</packaging>
 
