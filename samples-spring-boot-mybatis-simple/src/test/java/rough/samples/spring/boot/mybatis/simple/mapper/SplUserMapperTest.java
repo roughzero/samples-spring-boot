@@ -9,10 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import rough.samples.spring.boot.mybatis.simple.Application;
+import rough.samples.spring.boot.mybatis.simple.mapper.ex.SplUserExMapper;
 import rough.samples.spring.boot.mybatis.simple.model.SplUser;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -21,6 +23,8 @@ import java.util.Date;
 public class SplUserMapperTest {
     @Resource
     private SplUserMapper mapper;
+    @Resource
+    private SplUserExMapper exMapper;
 
     @Before
     public void prepareTest() {
@@ -36,6 +40,20 @@ public class SplUserMapperTest {
     @Test
     public void testMapper() {
         SplUser user = mapper.selectByPrimaryKey("001");
+        Assert.assertNotNull(user);
+        Assert.assertEquals("001", user.getUserId());
+        Assert.assertEquals("TEST_001", user.getUserCode());
+        Assert.assertEquals("测试用户", user.getUserName());
+
+        user = exMapper.selectByUserCode("TEST_001");
+        Assert.assertNotNull(user);
+        Assert.assertEquals("001", user.getUserId());
+        Assert.assertEquals("TEST_001", user.getUserCode());
+        Assert.assertEquals("测试用户", user.getUserName());
+
+        List<SplUser> users = exMapper.selectByUserName("测试用户");
+        Assert.assertFalse(users.isEmpty());
+        user = users.get(0);
         Assert.assertNotNull(user);
         Assert.assertEquals("001", user.getUserId());
         Assert.assertEquals("TEST_001", user.getUserCode());

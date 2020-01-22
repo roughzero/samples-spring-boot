@@ -16,6 +16,7 @@
         <javaModelGenerator targetPackage="rough.samples.spring.boot.mybatis.model"
                             targetProject="output/src/main/java">
             <property name="trimStrings" value="true"/>
+            <property name="exampleTargetProject" value="output/src/main/example"/>
         </javaModelGenerator>
 
         <sqlMapGenerator targetPackage="rough.samples.spring.boot.mybatis.mapper"

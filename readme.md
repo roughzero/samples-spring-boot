@@ -8,13 +8,14 @@ Spring boot 工程相关示例，内容如下：
   - [x] 多数据源的 NamedJdbcTemplate 配置
   - [x] 多数据源时数据库连接与 jndi 配置兼容
   - [ ] myBatis 多数据源配置
-- [ ] MyBatis 生成与添加方法
-  - [ ] 使用 MyBatis Generator 生成
-    - [ ] MyBatis3（传统 XML 形态）
-    - [ ] MyBatis3Simple（注解形态）
+- [x] MyBatis 生成与添加方法
+  - [x] 使用 MyBatis Generator 生成
+    - [x] MyBatis3（传统 XML 形态）
+    - [x] MyBatis3Simple（注解形态）
     - [x] MyBatis3DynamicSql（暂不研究）
     - [x] MyBatis3Kotlin（略）
-- [x] 打包发布
+  - [x] 添加新方法（含动态SQL示例）
+- [ ] 打包发布
   - [x] 打包成原始，而不是可执行
   - [x] 同一个工程做成多个包，可以根据需要发布选定的内容
   - [x] 指定包名
@@ -30,7 +31,11 @@ Spring boot 工程相关示例，内容如下：
   - [x] 切片以及使用例子
   - [x] Log的配置方法
 
+---
+
 ## 发布到 weblogic
+
+---
 
 ## 数据源配置
 
@@ -123,6 +128,8 @@ public class DataSourceConfigure {
 
 ### 多数据源的 myBatis 配置
 
+---
+
 ## MyBatis 生成与添加方法
 
 ### 使用 MyBatis Generator 生成
@@ -144,14 +151,14 @@ public class DataSourceConfigure {
 -- 准备示例数据表，包含 VARCHAR 和 CHAR 类型
 CREATE TABLE SPL_USER
 (
-    USER_ID        CHAR (30) NOT NULL PRIMARY KEY,
+    USER_ID        CHAR (20) NOT NULL PRIMARY KEY,
     USER_CODE      CHAR (20) NOT NULL,
     USER_NAME      VARCHAR2 (100),
     CREATE_TIME    DATE
 );
 ```
 
-
+目前的结论时，可以实现生成的 SQL 正常查询 CHAR，使用 Example 则不行，因此，会在<font color="red">**规范中禁用 Example 的使用**</font>。
 
 关于 MyBatis 生成部分的资料参见 [MyBatis Generator 官方网站](http://mybatis.org/generator/index.html)
 
@@ -254,6 +261,75 @@ SimpleSelectByPrimaryKeyElementGenerator
 
 这个生成的是 Kotlin，就忽略了
 
+### 添加新方法（含动态SQL示例）
+
+注意事项：
+
+1. 为了不影响数据库修改的重新打包，所有新方法<font color="red">**不能**</font>添加到生成的 Mapper 中。
+2. 建议将生成的文件单独打成 jar 包，至少与代码 package 分离
+
+添加过程，建议使用注解方式添加，同时可以实现动态 SQL。
+
+1. 非动态SQL，示例如下：
+
+```java
+@Mapper
+public interface SplUserExMapper {
+    @Select({"SELECT * FROM SPL_USER WHERE USER_CODE = RPAD(#{userCode,jdbcType=CHAR}, 20, ' ')"})
+    // 这里使用 ResultMap id 是由程序生成的默认 Map
+    @ResultMap("rough.samples.spring.boot.mybatis.mapper.SplUserMapper.BaseResultMap")
+    SplUser selectByUserCode(String userCode);
+
+    @Select({"SELECT * FROM SPL_USER WHERE USER_NAME = #{userName, jdbcType=VARCHAR}"})
+    // 这里使用了 @Results 标签来定义返回，作为示例
+    @Results({
+            @Result(column="USER_ID", property="userId", jdbcType=JdbcType.CHAR, id=true),
+            @Result(column="USER_CODE", property="userCode", jdbcType=JdbcType.CHAR),
+            @Result(column="USER_NAME", property="userName", jdbcType=JdbcType.VARCHAR),
+            @Result(column="CREATE_TIME", property="createTime", jdbcType=JdbcType.TIMESTAMP)
+    })
+    List<SplUser> selectByUserName(String userName);
+}
+```
+
+2. 动态 SQL，示例如下：
+
+   1. Mapper
+
+   ```java
+       @SelectProvider(type = SplUserSqlProvider.class, method = "selectByUserInfo")
+       // 注意不要遗漏 Result 定义
+       @ResultMap("rough.samples.spring.boot.mybatis.mapper.SplUserMapper.BaseResultMap")
+       List<SplUser> selectByUserInfo(SplUser user);
+   ```
+
+   2. Provider
+
+   ```java
+   public class SplUserSqlProvider {
+       public String selectByUserInfo(SplUser user) {
+           StringBuilder sql = new StringBuilder();
+           sql.append("SELECT * FROM SPL_USER");
+           if (user == null) {
+               sql.append(" WHERE 1 <> 1");
+               return sql.toString();
+           }
+           sql.append(" WHERE 1 = 1"); // 使用这个避免 WHERE 和 AND 的判断
+           if (user.getUserCode() != null) {
+               sql.append(" AND USER_CODE = RPAD(#{userCode, jdbcType=CHAR}, 20, ' ')");
+           }
+           if (user.getUserName() != null) {
+               sql.append(" AND USER_NAME = #{userName, jdbcType=VARCHAR}");
+           }
+           return sql.toString();
+       }
+   }
+   ```
+
+   注意这个 Provider 是不归 spring 管理的，所以不要想在 Provider 里面再去查询数据库什么的。但是可以把执行 SQL 传给  Provider，实现真动态 SQL，而不是在 XML 里面定义的。
+
+---
+
 ## 打包发布
 
 如果是比较小的 Spring Boot 工程，打包发布其实没什么好研究的，这里打包发布的主要目的是要让 Spring Boot 工程也模块话，可以分成多个 jar 包，提高模块的独立性已方便多人合作，也便于管理，避免一个工程过大的情况。
@@ -336,7 +412,7 @@ spring:
     </profiles>
 ```
 
-
+---
 
 ## 其他
 

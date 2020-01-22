@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-@MapperScan(value = {"rough.samples.spring.boot.mybatis.simple.mapper"},
+@MapperScan(value = {"rough.samples.spring.boot.mybatis.simple.mapper", "rough.samples.spring.boot.mybatis.simple.mapper.ex"},
         sqlSessionFactoryRef = "sqlSessionFactory")
 public class MyBatisConfigure {
     @Bean(name = "sqlSessionFactory")
