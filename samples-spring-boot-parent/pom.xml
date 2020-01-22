@@ -44,7 +44,7 @@
     </dependencyManagement>
 
     <!-- 使用编译参数打包成不同环境的发布包 -->
-    <!-- 在打包时使用 -PprofileId 的形式选择环境 -->
+    <!-- 在打包时使用 -P${profileId} 的形式选择环境 -->
     <!-- test 默认环境，供开发人员在 IDE 下测试，除了 test 环境以外，均需要使用 jndi -->
     <!-- dev 供开发人员在本机的 weblogic 测试 -->
     <!-- dat 测试人员测试环境 -->
@@ -80,7 +80,7 @@
                     <classifier>exec</classifier> <!-- 打包时生成原始包与可执行包，可执行包结尾的加上 exec 标识 -->
                     <attach>false</attach> <!-- 发布到仓库时只发布原始包，不发布可执行包 -->
                     <!-- 由于在打 war 包时是在 classes 目录里面找 main class 的， 所以需要指定 main class -->
-                    <mainClass>rough.samples.springboot.Application</mainClass>
+                    <mainClass>rough.samples.spring.boot.Application</mainClass>
                 </configuration>
             </plugin>
         </plugins>

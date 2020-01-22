@@ -3,11 +3,11 @@
 Spring boot 工程相关示例，内容如下：
 
 - [x] 发布到 weblogic
-- [ ] 数据源配置
+- [x] 数据源配置
   - [x] 使用 jndi 数据源
   - [x] 多数据源的 NamedJdbcTemplate 配置
   - [x] 多数据源时数据库连接与 jndi 配置兼容
-  - [ ] myBatis 多数据源配置
+  - [x] myBatis 多数据源配置
 - [x] MyBatis 生成与添加方法
   - [x] 使用 MyBatis Generator 生成
     - [x] MyBatis3（传统 XML 形态）
@@ -15,7 +15,7 @@ Spring boot 工程相关示例，内容如下：
     - [x] MyBatis3DynamicSql（暂不研究）
     - [x] MyBatis3Kotlin（略）
   - [x] 添加新方法（含动态SQL示例）
-- [ ] 打包发布
+- [x] 打包发布
   - [x] 打包成原始，而不是可执行
   - [x] 同一个工程做成多个包，可以根据需要发布选定的内容
   - [x] 指定包名
@@ -110,7 +110,7 @@ public class DataSourceConfigure {
     @Bean(name = "dataSource02")
     @Qualifier("dataSource02")
     @ConfigurationProperties(prefix = "samples.spring.boot.datasource02")
-    @Primary // 至少需要定义一个 Primay
+    @Primary // 至少需要定义一个 Primary
     public DataSource dataSource02() {
         if (StringUtils.isNotEmpty(jndiConfigure.getDatasource02())) {
             log.info("Jndi name of data source 02: " + jndiConfigure.getDatasource02());
@@ -122,7 +122,7 @@ public class DataSourceConfigure {
             return DataSourceBuilder.create().build();
         }
     }
-	...
+	//...
 }
 ```
 
@@ -199,11 +199,11 @@ CREATE TABLE SPL_USER
 
    ```java
    public class MyMyBatis3FormattingUtilities {
-       public static final String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn) {
+       public static String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn) {
            return getParameterClauseInWhereCondition(introspectedColumn, null);
        }
    
-       public static final String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn, String prefix) {
+       public static String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn, String prefix) {
            StringBuilder sb = new StringBuilder();
    
            if (introspectedColumn.getJdbcType() == Types.CHAR) {
@@ -221,18 +221,17 @@ CREATE TABLE SPL_USER
            return sb.toString();
        }
    }
-   
    ```
 
    2. 修改创建 XML 中 SQL 代码的类，调整生成查询条件的代码，使其生成额外做过处理的代码，这几个类为 org.mybatis.generator.codegen.mybatis3 包下的
 
    ```java
-   DeleteByPrimaryKeyElementGenerator
-   SelectByPrimaryKeyElementGenerator
-SimpleSelectByPrimaryKeyElementGenerator
-   UpdateByPrimaryKeySelectiveElementGenerator
-   UpdateByPrimaryKeyWithBLOBsElementGenerator
-   UpdateByPrimaryKeyWithoutBLOBsElementGenerator
+class DeleteByPrimaryKeyElementGenerator{}
+class SelectByPrimaryKeyElementGenerator{}
+class SimpleSelectByPrimaryKeyElementGenerator{}
+class class UpdateByPrimaryKeySelectiveElementGenerator{}
+class UpdateByPrimaryKeyWithBLOBsElementGenerator{}
+class UpdateByPrimaryKeyWithoutBLOBsElementGenerator{}
    ```
    
    可参见例子，这些代码都是根据原始代码进行修改的，使用`MyMyBatis3FormattingUtilities`的地方就是修改的地方。
@@ -297,10 +296,12 @@ public interface SplUserExMapper {
    1. Mapper
 
    ```java
+    public interface SplUserExMapper {
        @SelectProvider(type = SplUserSqlProvider.class, method = "selectByUserInfo")
        // 注意不要遗漏 Result 定义
        @ResultMap("rough.samples.spring.boot.mybatis.mapper.SplUserMapper.BaseResultMap")
        List<SplUser> selectByUserInfo(SplUser user);
+    }
    ```
 
    2. Provider
@@ -357,7 +358,7 @@ public interface SplUserExMapper {
         <classifier>exec</classifier> <!-- 打包时生成原始包与可执行包，可执行包结尾的加上 exec 标识 -->
         <attach>false</attach> <!-- 发布到仓库时只发布原始包，不发布可执行包 -->
         <!-- 由于在打 war 包时是在 classes 目录里面找 main class 的，所以需要指定 main class -->
-        <mainClass>rough.samples.springboot.Application</mainClass>
+        <mainClass>rough.samples.spring.boot.Application</mainClass>
     </configuration>
 </plugin>
 ```
@@ -386,7 +387,7 @@ spring:
 
 ```xml
     <!-- 使用编译参数打包成不同环境的发布包 -->
-    <!-- 在打包时使用 -PprofileId 的形式选择环境 -->
+    <!-- 在打包时使用 -P${profileId} 的形式选择环境 -->
     <!-- test 默认环境，供开发人员在 IDE 下测试，除了 test 环境以外，均需要使用 jndi -->
     <!-- dev 供开发人员在本机的 weblogic 测试 -->
     <!-- dat 测试人员测试环境 -->
@@ -440,7 +441,7 @@ public class DataSourceTest {
         Integer result = namedParameterJdbcTemplate01.queryForObject(
                 TEST_SQL, new HashMap<>(), Integer.class);
         log.info("Result of data source01 is: " + result);
-        Assert.assertEquals(result, Integer.valueOf(0));
+        Assert.assertEquals(result, 0);
     }
 
     @Test
@@ -448,7 +449,7 @@ public class DataSourceTest {
         Integer result = namedParameterJdbcTemplate02.queryForObject(
                 TEST_SQL, new HashMap<>(), Integer.class);
         log.info("Result of data source02 is: " + result);
-        Assert.assertEquals(result, Integer.valueOf(1));
+        Assert.assertEquals(result, 1);
     }
 }
 ```
