@@ -2,6 +2,10 @@ package rough.samples.spring.boot.db;
 
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -16,6 +20,10 @@ import javax.sql.DataSource;
 
 @Configuration
 @CommonsLog
+@MapperScan(value = {"rough.samples.spring.boot.db.ds01.mapper", "rough.samples.spring.boot.db.ds01.mapper.ex"},
+        sqlSessionFactoryRef = "sqlSessionFactory01")
+@MapperScan(value = {"rough.samples.spring.boot.db.ds02.mapper", "rough.samples.spring.boot.db.ds02.mapper.ex"},
+        sqlSessionFactoryRef = "sqlSessionFactory02")
 public class DataSourceConfigure {
     @Resource
     private JndiConfigure jndiConfigure;
@@ -40,6 +48,20 @@ public class DataSourceConfigure {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
+
+    @Bean(name = "sqlSessionFactory01")
+    @Qualifier("sqlSessionFactory01")
+    public SqlSessionFactory sqlSessionFactory01(@Qualifier("dataSource01") DataSource dataSource) throws Exception {
+        final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean("sqlSessionTemplate01")
+    public SqlSessionTemplate sqlSessionTemplate01(@Qualifier("sqlSessionFactory01") SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
     @Bean(name = "dataSource02")
     @Qualifier("dataSource02")
     @ConfigurationProperties(prefix = "samples.spring.boot.datasource02")
@@ -51,7 +73,7 @@ public class DataSourceConfigure {
             lookup.setResourceRef(true);
             return lookup.getDataSource(jndiConfigure.getDatasource02());
         } else {
-            log.info("Use direct connect for data source 01.");
+            log.info("Use direct connect for data source 02.");
             return DataSourceBuilder.create().build();
         }
     }
@@ -60,5 +82,18 @@ public class DataSourceConfigure {
     @Primary
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate02(@Qualifier("dataSource02") DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
+    }
+
+    @Bean(name = "sqlSessionFactory02")
+    @Qualifier("sqlSessionFactory02")
+    public SqlSessionFactory sqlSessionFactory02(@Qualifier("dataSource02") DataSource dataSource) throws Exception {
+        final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean("sqlSessionTemplate02")
+    public SqlSessionTemplate sqlSessionTemplate02(@Qualifier("sqlSessionFactory02") SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 }
