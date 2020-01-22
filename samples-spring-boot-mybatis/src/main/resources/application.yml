@@ -4,3 +4,11 @@ spring:
     username: rough
     password: rough
     driver-class-name: oracle.jdbc.driver.OracleDriver
+
+logging:
+  level:
+    rough:
+      samples:
+        spring:
+          boot:
+            mybatis: debug
