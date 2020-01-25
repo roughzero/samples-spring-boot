@@ -1,12 +1,16 @@
 package rough.samples.spring.boot.mybatis.mapper.ex;
 
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.JdbcType;
-import rough.samples.spring.boot.mybatis.mapper.SplUserMapper;
-import rough.samples.spring.boot.mybatis.model.SplUser;
-
-import java.security.Provider;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultMap;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.type.JdbcType;
+
+import rough.samples.spring.boot.mybatis.model.SplUser;
 
 @Mapper
 public interface SplUserExMapper {

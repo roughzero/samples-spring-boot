@@ -1,14 +1,10 @@
 package rough.samples.spring.boot.mybatis.mapper.ex;
 
-import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Repository;
-import rough.samples.spring.boot.mybatis.mapper.SplUserMapper;
+
 import rough.samples.spring.boot.mybatis.model.SplUser;
 
-import javax.annotation.Resource;
-
 @Repository
-@CommonsLog
 public class SplUserSqlProvider {
     public String selectByUserInfo(SplUser user) {
         StringBuilder sql = new StringBuilder();

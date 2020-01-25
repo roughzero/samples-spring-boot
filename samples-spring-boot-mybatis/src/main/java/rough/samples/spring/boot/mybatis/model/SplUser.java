@@ -1,7 +1,5 @@
 package rough.samples.spring.boot.mybatis.model;
 
-import rough.samples.spring.boot.mybatis.mapper.SplUserMapper;
-
 import java.util.Date;
 
 public class SplUser {

@@ -1,11 +1,10 @@
 package rough.samples.spring.boot.db.ds01.mapper.ex;
 
-import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Repository;
+
 import rough.samples.spring.boot.db.ds01.model.SplUser;
 
 @Repository
-@CommonsLog
 public class SplUserSqlProvider {
     public String selectByUserInfo(SplUser user) {
         StringBuilder sql = new StringBuilder();

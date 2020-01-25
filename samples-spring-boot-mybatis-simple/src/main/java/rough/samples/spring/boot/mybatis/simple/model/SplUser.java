@@ -1,7 +1,5 @@
 package rough.samples.spring.boot.mybatis.simple.model;
 
-import org.apache.ibatis.annotations.ResultMap;
-
 import java.util.Date;
 
 public class SplUser {
