@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>rough.samples</groupId>
@@ -10,7 +10,6 @@
         <module>../samples-spring-boot-bootapp</module>
         <module>../samples-spring-boot-db</module>
         <module>../samples-spring-boot-rest</module>
-        <module>../samples-spring-boot-mybatis-dynamic-sql</module>
         <module>../samples-spring-boot-mybatis</module>
         <module>../samples-spring-boot-mybatis-simple</module>
     </modules>
@@ -24,6 +23,7 @@
 
     <properties>
         <oracle.driver.version>11g1.6</oracle.driver.version>
+        <mybatis-spring-boot-starter.version>2.1.1</mybatis-spring-boot-starter.version>
     </properties>
     <dependencies>
         <!-- Provided dependencies -->
@@ -53,16 +53,18 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- oracle 数据库驱动 -->
             <dependency>
                 <groupId>com.oracle.driver</groupId>
                 <artifactId>jdbc-driver</artifactId>
                 <version>${oracle.driver.version}</version>
                 <scope>test</scope>
             </dependency>
+            <!-- mybatis 支持 -->
             <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>1.1.1</version>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

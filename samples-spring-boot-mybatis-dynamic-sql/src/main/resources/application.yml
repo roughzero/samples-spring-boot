@@ -1,6 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:oracle:thin:@192.168.5.128:1521:demo
-    username: rough
-    password: rough
-    driver-class-name: oracle.jdbc.driver.OracleDriver
