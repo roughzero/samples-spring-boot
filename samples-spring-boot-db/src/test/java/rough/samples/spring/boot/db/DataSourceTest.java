@@ -8,14 +8,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import rough.samples.spring.boot.Application;
+import rough.samples.spring.boot.TestApplication;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = Application.class)
+@ContextConfiguration(classes = TestApplication.class)
 @CommonsLog
 public class DataSourceTest {
     private static final String TEST_SQL = "SELECT COUNT(1) FROM DEMO_LOCK";

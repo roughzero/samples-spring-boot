@@ -1,4 +1,4 @@
-package rough.samples.spring.boot.db;
+package rough.samples.spring.boot.test;
 
 import lombok.extern.apachecommons.CommonsLog;
 import org.aspectj.lang.ProceedingJoinPoint;

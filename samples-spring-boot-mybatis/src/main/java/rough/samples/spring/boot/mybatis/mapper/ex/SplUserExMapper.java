@@ -22,10 +22,10 @@ public interface SplUserExMapper {
     @Select({"SELECT * FROM SPL_USER WHERE USER_NAME = #{userName, jdbcType=VARCHAR}"})
     // 这里使用了 @Results 标签来定义返回，作为示例
     @Results({
-            @Result(column="USER_ID", property="userId", jdbcType=JdbcType.CHAR, id=true),
-            @Result(column="USER_CODE", property="userCode", jdbcType=JdbcType.CHAR),
-            @Result(column="USER_NAME", property="userName", jdbcType=JdbcType.VARCHAR),
-            @Result(column="CREATE_TIME", property="createTime", jdbcType=JdbcType.TIMESTAMP)
+        @Result(column = "USER_ID", property = "userId", jdbcType = JdbcType.CHAR, id = true),
+        @Result(column = "USER_CODE", property = "userCode", jdbcType = JdbcType.CHAR),
+        @Result(column = "USER_NAME", property = "userName", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "CREATE_TIME", property = "createTime", jdbcType = JdbcType.TIMESTAMP)
     })
     List<SplUser> selectByUserName(String userName);
 

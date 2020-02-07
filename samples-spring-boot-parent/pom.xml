@@ -12,6 +12,7 @@
         <module>../samples-spring-boot-rest</module>
         <module>../samples-spring-boot-mybatis</module>
         <module>../samples-spring-boot-mybatis-simple</module>
+        <module>../samples-spring-boot-test</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -39,6 +40,12 @@
         </dependency>
 
         <!-- Test dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>samples-spring-boot-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

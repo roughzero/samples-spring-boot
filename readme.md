@@ -419,6 +419,35 @@ spring:
 
 ### 测试类
 
+为测试搭建单独模块 samples-spring-boot-test，并将其依赖放到 parent 中保证都可以用到。该模块包括启动类 `TestApplication` 以及测试配置文件 `application-test.yml`。
+
+TestApplication.java
+
+```java
+@SpringBootApplication
+@ComponentScan("rough")
+@Slf4j
+public class TestApplication {
+    public static void main(String[] args) {
+        log.info("Start test.");
+        SpringApplication.run(TestApplication.class, args);
+    }
+}
+```
+
+在 parent 中的 pom.xml 的配置
+
+```xml
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>samples-spring-boot-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+```
+
+
+
 使用 Junit 测试类，注意测试类不能管理事务，示例如下：
 
 必须要使用的是前面三个注解。
@@ -426,8 +455,8 @@ spring:
 ```java
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = Application.class)
-@CommonsLog
+@ContextConfiguration(classes = TestApplication.class)
+@Slf4j
 public class DataSourceTest {
     private static final String TEST_SQL = "SELECT COUNT(1) FROM DEMO_LOCK";
 

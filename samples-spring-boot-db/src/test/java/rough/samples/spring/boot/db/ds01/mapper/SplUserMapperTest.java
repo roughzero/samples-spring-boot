@@ -1,10 +1,5 @@
 package rough.samples.spring.boot.db.ds01.mapper;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,14 +7,17 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import rough.samples.spring.boot.Application;
+import rough.samples.spring.boot.TestApplication;
 import rough.samples.spring.boot.db.ds01.mapper.ex.SplUserExMapper;
 import rough.samples.spring.boot.db.ds01.model.SplUser;
 
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = Application.class)
+@ContextConfiguration(classes = TestApplication.class)
 public class SplUserMapperTest {
     @Resource
     private SplUserMapper mapper;

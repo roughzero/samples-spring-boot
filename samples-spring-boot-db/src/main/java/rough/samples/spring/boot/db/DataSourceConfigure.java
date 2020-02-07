@@ -20,9 +20,9 @@ import javax.sql.DataSource;
 
 @Configuration
 @CommonsLog
-@MapperScan(value = {"rough.samples.spring.boot.db.ds01.mapper", "rough.samples.spring.boot.db.ds01.mapper.ex"},
+@MapperScan(value = {"rough.samples.spring.boot.db.ds01.mapper"},
         sqlSessionFactoryRef = "sqlSessionFactory01")
-@MapperScan(value = {"rough.samples.spring.boot.db.ds02.mapper", "rough.samples.spring.boot.db.ds02.mapper.ex"},
+@MapperScan(value = {"rough.samples.spring.boot.db.ds02.mapper"},
         sqlSessionFactoryRef = "sqlSessionFactory02")
 public class DataSourceConfigure {
     @Resource
