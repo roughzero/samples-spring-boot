@@ -8,14 +8,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import rough.samples.spring.boot.TestApplication;
+import rough.samples.spring.boot.test.DbTestApplication;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = TestApplication.class)
+@ContextConfiguration(classes = DbTestApplication.class)
 @CommonsLog
 public class DataSourceTest {
     private static final String TEST_SQL = "SELECT COUNT(1) FROM DEMO_LOCK";
@@ -38,6 +38,6 @@ public class DataSourceTest {
         Integer result = namedParameterJdbcTemplate02.queryForObject(
                 TEST_SQL, new HashMap<>(), Integer.class);
         log.info("Result of data source02 is: " + result);
-        Assert.assertEquals(result, Integer.valueOf(1));
+        Assert.assertEquals(result, Integer.valueOf(2));
     }
 }
