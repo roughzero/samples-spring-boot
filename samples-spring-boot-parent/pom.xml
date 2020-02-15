@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>rough.samples</groupId>
@@ -22,7 +22,6 @@
     </parent>
 
     <properties>
-        <oracle.driver.version>11g1.6</oracle.driver.version>
         <mybatis-spring-boot-starter.version>2.1.1</mybatis-spring-boot-starter.version>
     </properties>
     <dependencies>
@@ -37,6 +36,19 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- oracle 数据库驱动 -->
+        <dependency>
+            <groupId>com.oracle.ojdbc</groupId>
+            <artifactId>orai18n</artifactId>
+            <version>19.3.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.ojdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.3.0.0</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -44,22 +56,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.oracle.driver</groupId>
-            <artifactId>jdbc-driver</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
-            <!-- oracle 数据库驱动 -->
-            <dependency>
-                <groupId>com.oracle.driver</groupId>
-                <artifactId>jdbc-driver</artifactId>
-                <version>${oracle.driver.version}</version>
-                <scope>test</scope>
-            </dependency>
             <!-- mybatis 支持 -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
