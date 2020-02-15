@@ -5,12 +5,12 @@ samples:
         jdbc-url: jdbc:oracle:thin:@192.168.5.128:1521:demo
         username: rough
         password: rough
-        driver-class-name: oracle.jdbc.driver.OracleDriver
+        driver-class-name: oracle.jdbc.OracleDriver
       datasource02:
         jdbc-url: jdbc:oracle:thin:@192.168.5.128:1521:demo
         username: rough01
         password: rough01
-        driver-class-name: oracle.jdbc.driver.OracleDriver
+        driver-class-name: oracle.jdbc.OracleDriver
       # jndi-datasource 下对应的数据源设置了名称后就会使用 jndi，如果没有设置则会使用数据库连接方式的数据源
       jndi-datasource:
         datasource01: DataSource01
