@@ -1,5 +1,6 @@
 package rough.samples.spring.boot.db.ds01.mapper;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import rough.samples.spring.boot.db.ds01.mapper.ex.SplUserExMapper;
 import rough.samples.spring.boot.db.ds01.model.SplUser;
+import rough.samples.spring.boot.db.dto.UserDto;
 import rough.samples.spring.boot.test.DbTestApplication;
 
 import javax.annotation.Resource;
@@ -64,5 +66,15 @@ public class SplUserMapperTest {
         Assert.assertEquals("001", user.getUserId());
         Assert.assertEquals("TEST_001", user.getUserCode());
         Assert.assertEquals("测试用户", user.getUserName());
+
+        UserDto userDto = exMapper.selectUserDtoByUserCode("TEST_001");
+        Assert.assertNotNull(userDto);
+        Assert.assertEquals("TEST_001", userDto.getUserCode());
+        Assert.assertEquals("测试用户", userDto.getUserName());
+    }
+
+    @After
+    public void cleanup() {
+        mapper.deleteByPrimaryKey("TEST_001");
     }
 }

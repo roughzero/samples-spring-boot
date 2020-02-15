@@ -3,6 +3,7 @@ package rough.samples.spring.boot.db.ds01.mapper.ex;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import rough.samples.spring.boot.db.ds01.model.SplUser;
+import rough.samples.spring.boot.db.dto.UserDto;
 
 import java.util.List;
 
@@ -26,4 +27,7 @@ public interface SplUserExMapper {
     @SelectProvider(type = SplUserSqlProvider.class, method = "selectByUserInfo")
     @ResultMap("rough.samples.spring.boot.db.ds01.mapper.SplUserMapper.BaseResultMap")
     List<SplUser> selectByUserInfo(SplUser user);
+
+    @Select({"SELECT TRIM(USER_CODE) AS USER_CODE, USER_NAME FROM SPL_USER WHERE USER_CODE = RPAD(#{userCode,jdbcType=CHAR}, 20, ' ')"})
+    UserDto selectUserDtoByUserCode(String userCode);
 }
