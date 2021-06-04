@@ -15,6 +15,7 @@ Spring boot 工程相关示例，内容如下：
     - [x] MyBatis3DynamicSql（暂不研究）
     - [x] MyBatis3Kotlin（略）
   - [x] 添加新方法（含动态SQL示例）
+  - [x] 其他动态SQL实现方法
 - [x] 打包发布
   - [x] 打包成原始，而不是可执行
   - [x] 同一个工程做成多个包，可以根据需要发布选定的内容
@@ -226,12 +227,12 @@ CREATE TABLE SPL_USER
    2. 修改创建 XML 中 SQL 代码的类，调整生成查询条件的代码，使其生成额外做过处理的代码，这几个类为 org.mybatis.generator.codegen.mybatis3 包下的
 
    ```java
-class DeleteByPrimaryKeyElementGenerator{}
-class SelectByPrimaryKeyElementGenerator{}
-class SimpleSelectByPrimaryKeyElementGenerator{}
-class class UpdateByPrimaryKeySelectiveElementGenerator{}
-class UpdateByPrimaryKeyWithBLOBsElementGenerator{}
-class UpdateByPrimaryKeyWithoutBLOBsElementGenerator{}
+   class DeleteByPrimaryKeyElementGenerator{}
+   class SelectByPrimaryKeyElementGenerator{}
+   class SimpleSelectByPrimaryKeyElementGenerator{}
+   class class UpdateByPrimaryKeySelectiveElementGenerator{}
+   class UpdateByPrimaryKeyWithBLOBsElementGenerator{}
+   class UpdateByPrimaryKeyWithoutBLOBsElementGenerator{}
    ```
    
    可参见例子，这些代码都是根据原始代码进行修改的，使用`MyMyBatis3FormattingUtilities`的地方就是修改的地方。
@@ -266,6 +267,8 @@ class UpdateByPrimaryKeyWithoutBLOBsElementGenerator{}
 
 1. 为了不影响数据库修改的重新打包，所有新方法<font color="red">**不能**</font>添加到生成的 Mapper 中。
 2. 建议将生成的文件单独打成 jar 包，至少与代码 package 分离
+
+还有，这里的动态 SQL 指能够在运行时决定 SQL 内容，开发时不能确定 SQL 内容的情况。简单的例子就是查询 SQL 是存储在数据库中的，运行时查询出 SQL 后再查询使用的例子。
 
 添加过程，建议使用注解方式添加，同时可以实现动态 SQL。
 
@@ -328,6 +331,104 @@ public interface SplUserExMapper {
    ```
 
    注意这个 Provider 是不归 spring 管理的，所以不要想在 Provider 里面再去查询数据库什么的。但是可以把执行 SQL 传给  Provider，实现真动态 SQL，而不是在 XML 里面定义的。
+   
+   这个示例与 Mybatis 提供的动态 SQL 标签中的 where 标签的作用是一样的，这里的例子仅是说明如何在 java 类中实现动态 SQL 的效果。
+### 其他动态SQL实现方法
+
+除了在 Provider 中实现以外，还可以通过 map 参数来实现动态 SQL。
+
+下面的例子是根据传入的表名决定从哪个表中查询数据的例子。
+
+```sql
+SELECT COUNT(1) FROM ${tableName}
+```
+
+这里注意 ```${}``` 标签与 ```#{}``` 标签的使用区别，一个在 SQL 完成之前，作为 SQL 的组成部分，一个是 SQL 完成后的参数部分。
+
+极端的情况下，可以将运行查询语句全部传入。
+
+```sql
+${sql}
+```
+
+下面的例子实现传入 SQL，并返回 Map 对象
+
+```java
+public interface DynamicSqlMapper {
+    @Select("${sql}")
+    List<Map<String, Object>> queryForMapList(@Param("sql") String sql);
+}
+```
+
+测试语句如下：
+
+```java
+    String sql = "SELECT 1 AS CNT, SYSDATE AS CURRENT_TIME FROM DUAL";
+    List<Map<String, Object>> mapResults = dynamicSqlMapper.queryForMapList(sql);
+    Assert.assertNotNull(mapResults);
+    Assert.assertEquals(1, mapResults.size());
+    Map<String, Object> mapResult = mapResults.get(0);
+    log.info(mapResult);
+    log.info(mapResult.getClass());
+    Assert.assertFalse(mapResult instanceof QueryResultDto);
+    Assert.assertEquals(new BigDecimal(1), mapResult.get("CNT"));
+```
+
+上面的简单例子，传入的 sql 不能有参数，且不能指定返回对象类型，下面会增加传入参数以及通过拦截器改变返回对象类型的例子。
+
+```java
+// 参数对象类
+@Getter
+@Setter
+public class DynamicSqlDto {
+    /** 查询语句 */
+    private String sql;
+    /** 返回对象，默认为 Map */
+    private Class resultClass = Map.class;
+}
+
+// Mapper 类
+public interface DynamicSqlMapper {
+    // 这里的返回数据对象 object，可以通过拦截器修改为参数中指定的对象
+    @Select("${sql}")
+    List<Object> queryForList(DynamicSqlDto dynamicSqlDto);
+}
+
+// 拦截器类（该类由余其提供），较长，仅展示主体
+@Intercepts(@Signature(
+        type = Executor.class,
+        method = "query",
+        args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
+public class FileTypePlugin implements Interceptor {
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+        final Object[] args = invocation.getArgs();
+        MappedStatement ms = (MappedStatement) args[0];
+        Object parameterObject = args[1];
+        if (parameterObject instanceof DynamicSqlDto) {
+            DynamicSqlDto dynamicSqlDto = (DynamicSqlDto) parameterObject;
+            Class resultType = dynamicSqlDto.getResultType();
+            if (resultType != null) {
+                //替换返回类型
+                args[0] = replaceMappedStatementWithNewResultType(ms, resultType);
+            }
+        }
+        return invocation.proceed();
+    }
+}
+
+// 使配置生效，修改 DataSourceConfigure 类
+public class DataSourceConfigure {
+    ...
+    // 在 return sqlSessionFactoryBean.getObject(); 前增加
+    // 如果有多个 sqlSessionFactoryBean，则均需要增加
+	sqlSessionFactoryBean.setPlugins(new FileTypePlugin());
+    return sqlSessionFactoryBean.getObject();    
+    ...
+}
+```
+
+以上两种方法，可以结合使用，如在数据库中查询出 SQL，又可能需要根据某些条件替换 SQL 中字符，则将替换工作放在 Provider 中是一个方便的解决方案。
 
 ---
 
@@ -556,7 +657,7 @@ logging:
 
 4. 在程序中使用
 
-使用 slf4j 和 commons-logging 都可以，我个人比较习惯使用 commons-logging，原因是在记录 exception 时有 (msg, exception) 的方法比较方便。
+使用 slf4j 和 commons-logging 都可以，我个人比较习惯使用 commons-logging。
 
 ```java
 @CommonsLog // 使用 lombok 定义 commons-logging
@@ -568,8 +669,6 @@ public class UsageClass {
         log.info("log message"); // 无论是使用 slf4j 还是 commons-logging 记录工具的名称都是 log
     }
 }
-
-
 ```
 
 
@@ -578,4 +677,9 @@ public class UsageClass {
 
 
 
-参考资料： [简书上的Spring Boot Logging 配置](https://www.jianshu.com/p/1fa12b92d5c4)
+参考资料：
+
+[简书上的Spring Boot Logging 配置](https://www.jianshu.com/p/1fa12b92d5c4)
+
+[Mybatis动态SQL的实现](https://blog.csdn.net/lks1139230294/article/details/87957689)
+

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
+import rough.samples.spring.boot.db.plugin.FileTypePlugin;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -57,6 +58,7 @@ public class DataSourceConfigure {
         configuration.setMapUnderscoreToCamelCase(true);
         sqlSessionFactoryBean.setConfiguration(configuration);
         sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setPlugins(new FileTypePlugin());
         return sqlSessionFactoryBean.getObject();
     }
 
@@ -95,6 +97,7 @@ public class DataSourceConfigure {
         configuration.setMapUnderscoreToCamelCase(true);
         sqlSessionFactoryBean.setConfiguration(configuration);
         sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setPlugins(new FileTypePlugin());
         return sqlSessionFactoryBean.getObject();
     }
 
