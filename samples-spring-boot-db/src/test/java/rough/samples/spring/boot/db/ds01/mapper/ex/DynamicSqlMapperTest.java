@@ -19,7 +19,7 @@ import java.util.Map;
 @SpringBootTest
 @ContextConfiguration(classes = DbTestApplication.class)
 @CommonsLog
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unused"})
 public class DynamicSqlMapperTest {
 
     @Resource
@@ -66,6 +66,21 @@ public class DynamicSqlMapperTest {
             Object result = results.get(0);
             Assert.assertTrue(result instanceof QueryResultDto);
             Assert.assertEquals(2L, ((QueryResultDto) result).getCnt().longValue());
+        }
+
+        // 使用匿名类传入额外参数
+        sql = "SELECT #{cnt} AS CNT, SYSDATE AS CURRENT_TIME FROM DUAL";
+        {
+            List<Object> results = dynamicSqlMapper.queryForList(new DynamicSqlDto(sql, QueryResultDto.class) {
+                public int getCnt() {
+                    return 3;
+                }
+            });
+            Assert.assertNotNull(results);
+            Assert.assertEquals(1, results.size());
+            Object result = results.get(0);
+            Assert.assertTrue(result instanceof QueryResultDto);
+            Assert.assertEquals(3L, ((QueryResultDto) result).getCnt().longValue());
         }
 
     }
