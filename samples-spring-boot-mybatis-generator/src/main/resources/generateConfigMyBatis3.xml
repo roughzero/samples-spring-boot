@@ -1,0 +1,33 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <classPathEntry location="lib/jdbc-driver-11g1.6.jar"/>
+
+    <context id="simple" targetRuntime="MyBatis3Simple">
+        <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
+                        connectionURL="jdbc:oracle:thin:@192.168.5.128:1521:demo"
+                        userId="rough" password="rough"/>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="rough.samples.spring.boot.mybatis.model"
+                            targetProject="output/src/main/java">
+            <property name="trimStrings" value="true"/>
+            <property name="exampleTargetProject" value="output/src/main/example"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="rough.samples.spring.boot.mybatis.mapper"
+                         targetProject="output/src/main/resources/"/>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="rough.samples.spring.boot.mybatis.mapper"
+                             targetProject="output/src/main/java"/>
+
+        <table tableName="SPL_USER" domainObjectName="SplUser">
+            <property name="useActualColumnName" value="false"/>
+            <property name="trimString" value="true"/>
+        </table>
+    </context>
+</generatorConfiguration>
