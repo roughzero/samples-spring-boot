@@ -2,19 +2,18 @@
         "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-    <context id="simple" targetRuntime="MyBatis3Simple">
+    <context id="simple" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
                         connectionURL="jdbc:oracle:thin:@192.168.5.128:1521:demo"
                         userId="rough" password="rough"/>
 
         <javaTypeResolver>
-            <property name="forceBigDecimals" value="false"/>
+            <property name="forceBigDecimals" value="true"/>
         </javaTypeResolver>
 
         <javaModelGenerator targetPackage="rough.samples.spring.boot.mybatis.model"
                             targetProject="../samples-spring-boot-db/src/main/java">
             <property name="trimStrings" value="true"/>
-            <property name="exampleTargetProject" value="output/src/main/example"/>
         </javaModelGenerator>
 
         <sqlMapGenerator targetPackage="rough.samples.spring.boot.mybatis.mapper"
