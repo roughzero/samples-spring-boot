@@ -1,1 +1,0 @@
-java -cp "/home/rough/IdeaProjects/samples-spring-boot/out/production/samples-spring-boot-mybatis-generator:lib/jdbc-driver-10g1.6.jar:lib/mybatis-generator-core-1.4.0.jar" org.mybatis.generator.api.ShellRunner -overwrite -configfile $1
