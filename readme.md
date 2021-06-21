@@ -689,6 +689,8 @@ public class UsageClass {
 
 参考资料：
 
+[MyBatis Generator](http://mybatis.org/generator/index.html)
+
 [简书上的Spring Boot Logging 配置](https://www.jianshu.com/p/1fa12b92d5c4)
 
 [Mybatis动态SQL的实现](https://blog.csdn.net/lks1139230294/article/details/87957689)
