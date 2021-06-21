@@ -144,7 +144,17 @@ public class DataSourceConfigure {
    1. 读取后去掉尾部的空格
    2. 查询时使用去掉空格的字符串能够正常查询
 
-统一使用命令行生成方式，为简化执行命令，使用传统 java 工程而不是 maven 工程（mybatis-generator-core-1.4.0.jar 是通过 maven 库下载的）
+为此，先建立一个```samples-spring-boot-mybatis-generator-patch```工程，在其中放置需要覆盖 mybatis-generator 中的代码。
+
+然后，在建立 ```samples-spring-boot-mybatis-generator``` 工程，使用它生成逆向工程，详细如何使用见 pom.xml 文件以及示例。
+
+使用以下命令生成
+
+```shell
+mvn mybatis-generator:generate
+```
+
+
 
 使用的测试表结构如下，为包含自动生成序列主键
 
