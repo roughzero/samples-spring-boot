@@ -1,5 +1,7 @@
 # samples-spring-boot
 
+[TOC]
+
 Spring boot 工程相关示例，内容如下：
 
 - [x] 发布到 weblogic
@@ -8,6 +10,7 @@ Spring boot 工程相关示例，内容如下：
   - [x] 多数据源的 NamedJdbcTemplate 配置
   - [x] 多数据源时数据库连接与 jndi 配置兼容
   - [x] myBatis 多数据源配置
+  - [ ] 使用 MyBatis batch 处理 insert 与 update
 - [x] MyBatis 生成与添加方法
   - [x] 使用 MyBatis Generator 生成
     - [x] MyBatis3（传统 XML 形态）
@@ -52,6 +55,8 @@ Spring boot 工程相关示例，内容如下：
 # 这个是使用配置文件的例子，yml 就不举例了
 spring.datasource.jndi-name=JndiName
 ```
+
+### 多数据源的 myBatis 配置
 
 然后是多数据源，同样是需要读到数据源名称，这里我使用注入数据源名称到配置类中再生产的办法。
 
@@ -127,7 +132,50 @@ public class DataSourceConfigure {
 }
 ```
 
-### 多数据源的 myBatis 配置
+### 使用 MyBatis batch 处理 insert 与 update
+
+代码示例
+
+```java
+public class BatchProcess {
+    private static final int TEST_SIZE = 1000;
+
+    @Resource
+    private SqlSessionFactory sqlSessionFactory;
+
+    public void doBatch() {
+        // 使用 openSession 取得批量执行的 Session，再取得 Mapper
+        SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH);
+        SplUserMapper mapper = sqlSession.getMapper(SplUserMapper.class);
+        for (int i = 0; i < TEST_SIZE; i++) {
+            String userId = format.format(i);
+            SplUser user = new SplUser();
+            user.setUserId(userId);
+            user.setUserCode(userId);
+            mapper.insert(user);
+        }
+        // 注意最后一定要执行 flushStatements() 方法，否则批量操作不会提交数据库
+        // 如果一次操作的量很多，可以定期执行 flushStatements() 方法，以免内存积压过多
+        sqlSession.flushStatements();
+    }
+}
+```
+
+定义 SqlSession Bean
+
+```java
+public class DataSourceConfigure {
+    // 可以定义一个批量 SqlSession，这样就可以直接注入，不需要再 open。
+    @Bean("batchSqlSession01")
+    public SqlSession batchSqlSession(@Qualifier("sqlSessionFactory01") SqlSessionFactory sqlSessionFactory) {
+        // 注意，这里不能使用 new SqlSessionTemplate(sqlSessionFactory, ExecutorType.BATCH);
+        // 实验了以下，仍然是默认的提交方式
+        return sqlSessionFactory.openSession(ExecutorType.BATCH);
+    }
+}
+```
+
+
 
 ---
 
@@ -276,7 +324,7 @@ CREATE TABLE SPL_USER
 注意事项：
 
 1. 为了不影响数据库修改的重新打包，所有新方法<font color="red">**不能**</font>添加到生成的 Mapper 中。
-2. 建议将生成的文件单独打成 jar 包，至少与代码 package 分离
+2. 建议将生成的文件单独打成 jar 包，至少做到与代码 package 分离
 
 还有，这里的动态 SQL 指能够在运行时决定 SQL 内容，开发时不能确定 SQL 内容的情况。简单的例子就是查询 SQL 是存储在数据库中的，运行时查询出 SQL 后再查询使用的例子。
 
@@ -447,7 +495,7 @@ public class DataSourceConfigure {
 }
 ```
 
-以上两种方法，可以结合使用，如在数据库中查询出 SQL，又可能需要根据某些条件替换 SQL 中字符，则将替换工作放在 Provider 中是一个方便的解决方案。
+以上两种方法，可以结合使用，如在数据库中查询出 SQL，又可能需要根据某些条件替换 SQL 中字符，则将替换工作放在 Provider 中是一个方便地解决方案。
 
 ---
 
