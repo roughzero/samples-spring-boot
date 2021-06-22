@@ -19,7 +19,7 @@
       This element was generated on Tue Jan 21 19:57:40 CST 2020.
     -->
     delete from SPL_USER
-    where USER_ID = RPAD(#{userId,jdbcType=CHAR}, 20, ' ')
+    where USER_ID = RPAD(#{userId,jdbcType=CHAR}, 30, ' ')
   </delete>
   <insert id="insert" parameterType="rough.samples.spring.boot.db.ds01.model.SplUser">
     <!--
@@ -42,7 +42,7 @@
     set USER_CODE = #{userCode,jdbcType=CHAR},
       USER_NAME = #{userName,jdbcType=VARCHAR},
       CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
-    where USER_ID = RPAD(#{userId,jdbcType=CHAR}, 20, ' ')
+    where USER_ID = RPAD(#{userId,jdbcType=CHAR}, 30, ' ')
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     <!--
@@ -52,7 +52,7 @@
     -->
     select USER_ID, USER_CODE, USER_NAME, CREATE_TIME
     from SPL_USER
-    where USER_ID = RPAD(#{userId,jdbcType=CHAR}, 20, ' ')
+    where USER_ID = RPAD(#{userId,jdbcType=CHAR}, 30, ' ')
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     <!--

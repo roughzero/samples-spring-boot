@@ -2,6 +2,8 @@ package rough.samples.spring.boot.db;
 
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -25,6 +27,7 @@ import javax.sql.DataSource;
         sqlSessionFactoryRef = "sqlSessionFactory01")
 @MapperScan(value = {"rough.samples.spring.boot.db.ds02.mapper"},
         sqlSessionFactoryRef = "sqlSessionFactory02")
+@SuppressWarnings("unused")
 public class DataSourceConfigure {
     @Resource
     private JndiConfigure jndiConfigure;
@@ -65,6 +68,11 @@ public class DataSourceConfigure {
     @Bean("sqlSessionTemplate01")
     public SqlSessionTemplate sqlSessionTemplate01(@Qualifier("sqlSessionFactory01") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
+    @Bean("batchSqlSession01")
+    public SqlSession batchSqlSessionTemplate01(@Qualifier("sqlSessionFactory01") SqlSessionFactory sqlSessionFactory) {
+        return sqlSessionFactory.openSession(ExecutorType.BATCH);
     }
 
     @Bean(name = "dataSource02")
