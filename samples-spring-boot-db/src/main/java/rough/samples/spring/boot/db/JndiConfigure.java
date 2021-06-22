@@ -11,6 +11,7 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "samples.spring.boot.jndi-datasource")
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public class JndiConfigure {
     private String datasource01;
     private String datasource02;

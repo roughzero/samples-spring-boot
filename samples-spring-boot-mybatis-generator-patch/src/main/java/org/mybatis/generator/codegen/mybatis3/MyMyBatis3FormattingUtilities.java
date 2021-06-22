@@ -8,11 +8,11 @@ import java.sql.Types;
 import org.mybatis.generator.api.IntrospectedColumn;
 
 public class MyMyBatis3FormattingUtilities {
-    public static final String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn) {
+    public static String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn) {
         return getParameterClauseInWhereCondition(introspectedColumn, null);
     }
 
-    public static final String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn, String prefix) {
+    public static String getParameterClauseInWhereCondition(IntrospectedColumn introspectedColumn, String prefix) {
         StringBuilder sb = new StringBuilder();
 
         if (introspectedColumn.getJdbcType() == Types.CHAR) {

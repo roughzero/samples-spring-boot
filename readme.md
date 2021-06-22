@@ -240,7 +240,7 @@ CREATE TABLE SPL_USER
    class DeleteByPrimaryKeyElementGenerator{}
    class SelectByPrimaryKeyElementGenerator{}
    class SimpleSelectByPrimaryKeyElementGenerator{}
-   class class UpdateByPrimaryKeySelectiveElementGenerator{}
+   class UpdateByPrimaryKeySelectiveElementGenerator{}
    class UpdateByPrimaryKeyWithBLOBsElementGenerator{}
    class UpdateByPrimaryKeyWithoutBLOBsElementGenerator{}
    ```
@@ -373,15 +373,21 @@ public interface DynamicSqlMapper {
 测试语句如下：
 
 ```java
-    String sql = "SELECT 1 AS CNT, SYSDATE AS CURRENT_TIME FROM DUAL";
-    List<Map<String, Object>> mapResults = dynamicSqlMapper.queryForMapList(sql);
-    Assert.assertNotNull(mapResults);
-    Assert.assertEquals(1, mapResults.size());
-    Map<String, Object> mapResult = mapResults.get(0);
-    log.info(mapResult);
-    log.info(mapResult.getClass());
-    Assert.assertFalse(mapResult instanceof QueryResultDto);
-    Assert.assertEquals(new BigDecimal(1), mapResult.get("CNT"));
+public class Test {
+
+    @Test
+    public void test() {
+        String sql = "SELECT 1 AS CNT, SYSDATE AS CURRENT_TIME FROM DUAL";
+        List<Map<String, Object>> mapResults = dynamicSqlMapper.queryForMapList(sql);
+        Assert.assertNotNull(mapResults);
+        Assert.assertEquals(1, mapResults.size());
+        Map<String, Object> mapResult = mapResults.get(0);
+        log.info(mapResult);
+        log.info(mapResult.getClass());
+        Assert.assertFalse(mapResult instanceof QueryResultDto);
+        Assert.assertEquals(new BigDecimal(1), mapResult.get("CNT"));
+    }
+}
 ```
 
 上面的简单例子，传入的 sql 不能有参数，且不能指定返回对象类型，下面会增加传入参数以及通过拦截器改变返回对象类型的例子。
@@ -390,11 +396,12 @@ public interface DynamicSqlMapper {
 // 参数对象类
 @Getter
 @Setter
+@SuppressWarnings("rawtypes")
 public class DynamicSqlDto {
     /** 查询语句 */
     private String sql;
     /** 返回对象，默认为 Map */
-    private Class resultClass = Map.class;
+    private final Class resultClass = Map.class;
 }
 
 // Mapper 类
@@ -409,14 +416,14 @@ public interface DynamicSqlMapper {
         type = Executor.class,
         method = "query",
         args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
+@SuppressWarnings("rawtypes")
 public class FileTypePlugin implements Interceptor {
     @Override
-    public Object intercept(Invocation invocation) throws Throwable {
+    public Object intercept(Invocation invocation) {
         final Object[] args = invocation.getArgs();
         MappedStatement ms = (MappedStatement) args[0];
         Object parameterObject = args[1];
-        if (parameterObject instanceof DynamicSqlDto) {
-            DynamicSqlDto dynamicSqlDto = (DynamicSqlDto) parameterObject;
+        if (parameterObject instanceof DynamicSqlDto dynamicSqlDto) {
             Class resultType = dynamicSqlDto.getResultType();
             if (resultType != null) {
                 //替换返回类型
@@ -429,12 +436,14 @@ public class FileTypePlugin implements Interceptor {
 
 // 使配置生效，修改 DataSourceConfigure 类
 public class DataSourceConfigure {
-    ...
-    // 在 return sqlSessionFactoryBean.getObject(); 前增加
-    // 如果有多个 sqlSessionFactoryBean，则均需要增加
-	sqlSessionFactoryBean.setPlugins(new FileTypePlugin());
-    return sqlSessionFactoryBean.getObject();    
-    ...
+    //...
+    public SqlSessionFactory sqlSessionFactory() {
+        // 在 return sqlSessionFactoryBean.getObject(); 前增加
+        // 如果有多个 sqlSessionFactoryBean，则均需要增加
+        sqlSessionFactoryBean.setPlugins(new FileTypePlugin());
+        return sqlSessionFactoryBean.getObject();
+    }
+    //...
 }
 ```
 
@@ -648,7 +657,7 @@ logging:
           dbcp2: DEBUG 
 ```
 
-2. logging.path & logging.file
+2. logging path & logging file
 
 ```yaml
 logging:

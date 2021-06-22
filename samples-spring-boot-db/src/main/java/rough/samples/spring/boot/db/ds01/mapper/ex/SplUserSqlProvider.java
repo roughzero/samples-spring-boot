@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import rough.samples.spring.boot.db.ds01.model.SplUser;
 
 @Repository
+@SuppressWarnings("unused")
 public class SplUserSqlProvider {
     public String selectByUserInfo(SplUser user) {
         StringBuilder sql = new StringBuilder();

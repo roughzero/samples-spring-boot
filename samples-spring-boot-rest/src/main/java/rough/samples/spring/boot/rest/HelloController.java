@@ -41,7 +41,7 @@ public class HelloController {
             log.info("Catch exception for testTransaction() to check.");
         }
 
-        return "Hello!" + stringBuilder.toString();
+        return "Hello!" + stringBuilder;
     }
 
 }
