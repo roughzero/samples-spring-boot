@@ -40,7 +40,14 @@ public class BatchTest {
         testNormalInsert();
         cleanTestData();
         testBatchInsert();
-        // cleanTestData();
+        cleanTestData();
+        testNormalInsert();
+        cleanTestData();
+        testBatchInsert();
+        cleanTestData();
+        testNormalInsert();
+        cleanTestData();
+        testBatchInsert();
     }
 
     @Transactional

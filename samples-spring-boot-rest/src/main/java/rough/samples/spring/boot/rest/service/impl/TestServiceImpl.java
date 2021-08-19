@@ -3,17 +3,15 @@ package rough.samples.spring.boot.rest.service.impl;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import rough.samples.spring.boot.rest.service.TestService;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 
-@Transactional
 @CommonsLog
 @Service
 public class TestServiceImpl implements TestService {
-    @Resource(name = "namedParameterJdbcTemplate01")
+    @Resource(name = "namedParameterJdbcTemplate02")
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override

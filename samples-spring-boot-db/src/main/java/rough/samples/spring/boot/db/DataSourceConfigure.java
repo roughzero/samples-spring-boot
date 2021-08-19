@@ -11,10 +11,9 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import rough.samples.spring.boot.db.plugin.FileTypePlugin;
 
@@ -27,6 +26,7 @@ import javax.sql.DataSource;
         sqlSessionFactoryRef = "sqlSessionFactory01")
 @MapperScan(value = {"rough.samples.spring.boot.db.ds02.mapper"},
         sqlSessionFactoryRef = "sqlSessionFactory02")
+@ImportResource("classpath:/transaction-config.xml")
 @SuppressWarnings("unused")
 public class DataSourceConfigure {
     @Resource
@@ -47,11 +47,15 @@ public class DataSourceConfigure {
         }
     }
 
+    @Bean(name = "dataSourceTransactionManager01")
+    public DataSourceTransactionManager dataSourceTransactionManager01(@Qualifier("dataSource01") DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
     @Bean(name = "namedParameterJdbcTemplate01")
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate01(@Qualifier("dataSource01") DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
     }
-
 
     @Bean(name = "sqlSessionFactory01")
     @Qualifier("sqlSessionFactory01")
@@ -89,6 +93,12 @@ public class DataSourceConfigure {
             log.info("Use direct connect for data source 02.");
             return DataSourceBuilder.create().build();
         }
+    }
+
+    @Bean(name = "dataSourceTransactionManager02")
+    @Primary
+    public DataSourceTransactionManager dataSourceTransactionManager02(@Qualifier("dataSource02") DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean(name = "namedParameterJdbcTemplate02")
