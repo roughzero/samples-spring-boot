@@ -1,11 +1,17 @@
 package rough.samples.spring.boot.rest.service.impl;
 
 import lombok.extern.apachecommons.CommonsLog;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import rough.samples.spring.boot.db.ds01.mapper.SplUserMapper;
+import rough.samples.spring.boot.db.ds01.model.SplUser;
 import rough.samples.spring.boot.rest.service.TestService;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 
 @CommonsLog
@@ -15,6 +21,8 @@ public class TestServiceImpl implements TestService {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate01;
     @Resource(name = "namedParameterJdbcTemplate02")
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate02;
+    @Resource(name = "sqlSessionFactory01")
+    private SqlSessionFactory sqlSessionFactory01;
 
     @Override
     public void testTransaction() {
@@ -35,6 +43,19 @@ public class TestServiceImpl implements TestService {
             log.error(e, e);
         }
 
-        throw new RuntimeException();
+        SplUser splUser = new SplUser();
+        splUser.setUserId("test");
+        splUser.setUserCode("test");
+        splUser.setUserName("test");
+        splUser.setCreateTime(new Date(System.currentTimeMillis()));
+
+        SqlSession sqlSession = sqlSessionFactory01.openSession(ExecutorType.BATCH);
+        SplUserMapper splUserMapper = sqlSession.getMapper(SplUserMapper.class);
+
+        splUserMapper.insert(splUser);
+        splUserMapper.insert(splUser);
+
+        sqlSession.flushStatements();
+        // throw new RuntimeException();
     }
 }
