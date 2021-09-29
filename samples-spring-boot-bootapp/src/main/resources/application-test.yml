@@ -15,3 +15,12 @@ samples:
       jndi-datasource:
         datasource01:
         datasource02:
+
+logging:
+  level:
+    root: INFO
+    rough:
+      samples:
+        spring:
+          boot:
+            db: INFO

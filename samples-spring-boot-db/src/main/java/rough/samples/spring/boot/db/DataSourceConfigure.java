@@ -76,7 +76,8 @@ public class DataSourceConfigure {
 
     @Bean("batchSqlSession01")
     public SqlSession batchSqlSession01(@Qualifier("sqlSessionFactory01") SqlSessionFactory sqlSessionFactory) {
-        return sqlSessionFactory.openSession(ExecutorType.BATCH);
+        return new SqlSessionTemplate(sqlSessionFactory, ExecutorType.BATCH);
+        //return sqlSessionFactory.openSession(ExecutorType.BATCH);
     }
 
     @Bean(name = "dataSource02")

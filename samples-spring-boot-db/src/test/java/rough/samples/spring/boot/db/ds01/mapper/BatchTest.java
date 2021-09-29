@@ -38,15 +38,15 @@ public class BatchTest {
     public void test() {
         cleanTestData();
         testNormalInsert();
-        cleanTestData();
+        cleanTestDataBatch();
         testBatchInsert();
         cleanTestData();
         testNormalInsert();
-        cleanTestData();
+        cleanTestDataBatch();
         testBatchInsert();
         cleanTestData();
         testNormalInsert();
-        cleanTestData();
+        cleanTestDataBatch();
         testBatchInsert();
     }
 
@@ -98,5 +98,21 @@ public class BatchTest {
         deleted = batchResultList.stream().mapToInt(batchResult -> Arrays.stream(batchResult.getUpdateCounts()).sum()).sum();
         long cost = System.currentTimeMillis() - start;
         log.info("CleanTestData cost: " + cost + " milliseconds. deleted " + deleted);
+    }
+
+    public void cleanTestDataBatch() {
+        long start = System.currentTimeMillis();
+        SqlSession sqlSession = sqlSessionFactory01.openSession(ExecutorType.BATCH);
+        SplUserMapper mapper = sqlSession.getMapper(SplUserMapper.class);
+        NumberFormat format = new DecimalFormat("TEST_000000");
+        int deleted;
+        for (int i = 0; i < TEST_SIZE; i++) {
+            String userId = format.format(i);
+            mapper.deleteByPrimaryKey(userId);
+        }
+        List<BatchResult> batchResultList = sqlSession.flushStatements();
+        deleted = batchResultList.stream().mapToInt(batchResult -> Arrays.stream(batchResult.getUpdateCounts()).sum()).sum();
+        long cost = System.currentTimeMillis() - start;
+        log.info("CleanTestDataBatch cost: " + cost + " milliseconds. deleted " + deleted);
     }
 }

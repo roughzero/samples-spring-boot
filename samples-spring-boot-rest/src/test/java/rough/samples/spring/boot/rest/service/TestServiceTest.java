@@ -26,4 +26,14 @@ public class TestServiceTest {
             log.info("Catch exception for testTransaction() to check.");
         }
     }
+
+    @Test
+    public void testBatchTransaction() {
+        try {
+            testService.testBatchTransaction();
+        } catch (Throwable e) {
+            log.info("Catch exception for testBatchTransaction() to check.", e);
+        }
+    }
+
 }
